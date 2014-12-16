@@ -1,0 +1,12 @@
+.DS_Store
+.nodemonignore
+.sass-cache/
+.bower-*/
+.idea/
+node_modules/
+mean.iml
+test/coverage/
+modules/public/
+modules/views/
+/public/build/
+frontend/lib/
