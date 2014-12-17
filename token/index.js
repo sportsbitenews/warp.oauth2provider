@@ -68,7 +68,7 @@ module.exports = {
             },
             function (callback) {
                 // create redis record for accessToken -> key
-                options.client.setex(value.accessToken, options.ttl, JSON.stringify({
+                options.client.setex('accesstoken:' + value.accessToken, options.ttl, JSON.stringify({
                     key: key,
                     userId: user.id
                 }), callback);
