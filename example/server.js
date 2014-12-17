@@ -1,6 +1,8 @@
 var express = require('express'),
     redis = require('redis'),
-    bodyParser = require('body-parser');
+    bodyParser = require('body-parser'),
+    session = require('express-session'),
+    btoa = require('btoa');
 var app = express();
 var oauth2lib = require('../index'),
     oauth2 = new oauth2lib({
@@ -12,9 +14,16 @@ var oauth2lib = require('../index'),
         ttl: 600
     });
 
+app.use(session({
+    secret: 'keyboard cat',
+    resave: false,
+    saveUninitialized: true
+}));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(oauth2.inject());
+
+app.use('/', express.static('./frontend')); // static routes
 
 app.get('/secure', oauth2.middleware.isAuthorised, function(req, res) {
     res.json({
@@ -26,7 +35,19 @@ app.get('/insecure', function(req, res) {
     res.json(true);
 });
 
-app.post('/oauth/token', oauth2.token.create);
+app.post('/oauth/token', oauth2.middleware.createToken);
+
+app.post('/api/session', function(req, res){
+    req.oauth2.token.create(req.oauth2.options, req.body, {
+        authorization: 'Basic ' + btoa('3:secret')
+    }, function(err, data){
+        if (err){
+            res.status(err.status).send(err.body);
+        }
+        req.session.accessToken = data.accessToken;
+        return res.json(data);
+    });
+});
 
 var server = app.listen(3000, function () {
     var host = server.address().address;

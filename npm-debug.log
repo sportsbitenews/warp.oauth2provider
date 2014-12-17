@@ -1,0 +1,103 @@
+0 info it worked if it ends with ok
+1 verbose cli [ 'node', '/usr/local/bin/npm', 'publish' ]
+2 info using npm@1.4.28
+3 info using node@v0.10.33
+4 verbose publish [ '.' ]
+5 verbose cache add [ '.', null ]
+6 verbose cache add name=undefined spec="." args=[".",null]
+7 verbose parsed url { protocol: null,
+7 verbose parsed url   slashes: null,
+7 verbose parsed url   auth: null,
+7 verbose parsed url   host: null,
+7 verbose parsed url   port: null,
+7 verbose parsed url   hostname: null,
+7 verbose parsed url   hash: null,
+7 verbose parsed url   search: null,
+7 verbose parsed url   query: null,
+7 verbose parsed url   pathname: '.',
+7 verbose parsed url   path: '.',
+7 verbose parsed url   href: '.' }
+8 silly lockFile 3a52ce78- .
+9 verbose lock . /Users/chris/.npm/3a52ce78-.lock
+10 verbose tar pack [ '/Users/chris/.npm/warp.oauth2provider/0.0.4/package.tgz',
+10 verbose tar pack   '.' ]
+11 verbose tarball /Users/chris/.npm/warp.oauth2provider/0.0.4/package.tgz
+12 verbose folder .
+13 info prepublish warp.oauth2provider@0.0.4
+14 silly lockFile 1f1177db-tar tar://.
+15 verbose lock tar://. /Users/chris/.npm/1f1177db-tar.lock
+16 silly lockFile b4ee872c-oauth2provider-0-0-4-package-tgz tar:///Users/chris/.npm/warp.oauth2provider/0.0.4/package.tgz
+17 verbose lock tar:///Users/chris/.npm/warp.oauth2provider/0.0.4/package.tgz /Users/chris/.npm/b4ee872c-oauth2provider-0-0-4-package-tgz.lock
+18 silly lockFile 1f1177db-tar tar://.
+19 silly lockFile 1f1177db-tar tar://.
+20 silly lockFile b4ee872c-oauth2provider-0-0-4-package-tgz tar:///Users/chris/.npm/warp.oauth2provider/0.0.4/package.tgz
+21 silly lockFile b4ee872c-oauth2provider-0-0-4-package-tgz tar:///Users/chris/.npm/warp.oauth2provider/0.0.4/package.tgz
+22 silly lockFile 609cbef6-arp-oauth2provider-0-0-4-package /Users/chris/.npm/warp.oauth2provider/0.0.4/package
+23 verbose lock /Users/chris/.npm/warp.oauth2provider/0.0.4/package /Users/chris/.npm/609cbef6-arp-oauth2provider-0-0-4-package.lock
+24 silly lockFile 609cbef6-arp-oauth2provider-0-0-4-package /Users/chris/.npm/warp.oauth2provider/0.0.4/package
+25 silly lockFile 609cbef6-arp-oauth2provider-0-0-4-package /Users/chris/.npm/warp.oauth2provider/0.0.4/package
+26 silly lockFile 3a52ce78- .
+27 silly lockFile 3a52ce78- .
+28 silly publish { name: 'warp.oauth2provider',
+28 silly publish   description: 'Easy to implement OAuth 2.0 / Redis provider implementation',
+28 silly publish   author: { name: 'Chris Beemster' },
+28 silly publish   version: '0.0.4',
+28 silly publish   repository:
+28 silly publish    { type: 'git',
+28 silly publish      url: 'https://github.com/wearereasonablepeople/warp.oauth2provider.git' },
+28 silly publish   dependencies: { async: '0.9.0' },
+28 silly publish   readmeFilename: 'README.md',
+28 silly publish   gitHead: '5c793422780c6a4ae946db31b04ed6c2170eae95',
+28 silly publish   bugs: { url: 'https://github.com/wearereasonablepeople/warp.oauth2provider/issues' },
+28 silly publish   homepage: 'https://github.com/wearereasonablepeople/warp.oauth2provider',
+28 silly publish   _id: 'warp.oauth2provider@0.0.4',
+28 silly publish   scripts: {},
+28 silly publish   _shasum: '9b9709159513c99228238d0aa2e5d88e177c50dd',
+28 silly publish   _from: '.',
+28 silly publish   readme: '# warp-oauth2provider\n\n## Overview\nwarp-oauth2provider is a simple but secure OAuth2 provider for ExpressJS 4 and Redis. A user can be logged in once per client.\n\nContains an example implementation, where the model is currently a static file, can be easily replaced with a SequelizeJS model (or similar, as long as it is implemented with a getByCredential method for the client and user object).\n\n## Changes\n0.0.3 Business logics and middleware separated.\n0.0.4 Updated documentation\n\n## Implementation\nThe example below is for illustrational purposes only. In real-life applications, store the sessions in Redis (or another session-store).\n\n\tvar express = require(\'express\'),\n\t    redis = require(\'redis\'),\n\t    bodyParser = require(\'body-parser\'),\n\t    session = require(\'express-session\'),\n\t    btoa = require(\'btoa\');\n\tvar app = express();\n\tvar oauth2lib = require(\'../index\'),\n\t    oauth2 = new oauth2lib({\n\t        client: redis.createClient(),\n\t        model: {\n\t            client: require(\'./models/client.js\'),\n\t            user: require(\'./models/user.js\')\n\t        },\n\t        ttl: 600\n\t    });\n\t\n\tapp.use(session({\n\t    secret: \'keyboard cat\',\n\t    resave: false,\n\t    saveUninitialized: true\n\t}));\n\tapp.use(bodyParser.urlencoded({ extended: false }));\n\tapp.use(bodyParser.json());\n\tapp.use(oauth2.inject());\n\t\n\tapp.use(\'/\', express.static(\'./frontend\')); // static routes\n\t\n\tapp.get(\'/secure\', oauth2.middleware.isAuthorised, function(req, res) {\n\t    res.json({\n\t        userId: req.userId\n\t    });\n\t});\n\t\n\tapp.get(\'/insecure\', function(req, res) {\n\t    res.json(true);\n\t});\n\t\n\tapp.post(\'/oauth/token\', oauth2.middleware.createToken);\n\t\n\tapp.post(\'/api/session\', function(req, res){\n\t    req.oauth2.token.create(req.oauth2.options, req.body, {\n\t        authorization: \'Basic \' + btoa(\'3:secret\')\n\t    }, function(err, data){\n\t        if (err){\n\t            res.status(err.status).send(err.body);\n\t        }\n\t        req.session.accessToken = data.accessToken;\n\t        return res.json(data);\n\t    });\n\t});\n\t\n\tvar server = app.listen(3000, function () {\n\t    var host = server.address().address;\n\t    var port = server.address().port;\n\t\n\t    console.log(\'Example app listening at http://%s:%s\', host, port);\n\t});\n\nAlso, see the /example folder in the module.\n\n## Usage\n### Create token\nFirst, make a POST to http://localhost:3000/oauth/token, with the following body:\n\n- grant_type: password\n- password: secret\n- scope: all\n- username: john@doe.com\n\n..and the following headers:\n\n- Content-Type: application/x-www-form-urlencoded; charset=utf-8\n- Accept-Language: nl;q=1, en;q=0.9, de;q=0.8\n- Authorization: Basic Mzptb29uc2hvdA==\n- User-Agent: YourAPP/47 (iPhone; iOS 8.1.1; Scale/2.00)\n\nThe Authorization header contains the string "Basic" and a base64-encoded string for "clientId:clientSecret". For instance "3:secret" will become "MzpzZWNyZXQ=".\n\nThis will return a JSON object like:\n\n\t{\n\t  "refreshToken" : "a5b0f1433b5ce909698d56e8931008b7da5a58d4d279ee8da7008ee408bb11573d1cc361f7350478fa9a51862341a97ddac73f4f75a13e3e5a9d797224274876",\n\t  "accessToken" : "471c6cdcb726ee045e72f3b76478f692e8a667b05ced8a33f9ff894b1572d882"\n\t}\n\nValidate your base64 strings on https://www.base64encode.org/\n\n### Sign in (for web-clients / server-side usage)\nIn order to allow a simple browser username / password sign-in mechanism, implement a method as follows:\n\n\tapp.post(\'/api/session\', function(req, res){\n\t    req.oauth2.token.create(req.oauth2.options, req.body, {\n\t        authorization: \'Basic \' + btoa(\'3:secret\')\n\t    }, function(err, data){\n\t        if (err){\n\t            res.status(err.status).send(err.body);\n\t        }\n\t        req.session.accessToken = data.accessToken;\n\t        return res.json(data);\n\t    });\n\t});\n\nYou\'ll manually pass the options, body and headers to the OAuth createToken method. The callback method allows you to store the accessToken in a session or cookie and to return whatever you want to your client.\n\n## Limitations\nCurrently only supports username / password authentication.\n\n## To-do\n- Make session-logics optional (currently an access-token can be stored in a session as well).\n\n## Feedback\nContact us on info@wearereasonablepeople.com' }
+29 verbose request where is /warp.oauth2provider
+30 verbose request registry https://registry.npmjs.org/
+31 verbose request id b279c6a4cda8c4ef
+32 verbose url raw /warp.oauth2provider
+33 verbose url resolving [ 'https://registry.npmjs.org/', './warp.oauth2provider' ]
+34 verbose url resolved https://registry.npmjs.org/warp.oauth2provider
+35 verbose request where is https://registry.npmjs.org/warp.oauth2provider
+36 info trying registry request attempt 1 at 13:47:14
+37 http PUT https://registry.npmjs.org/warp.oauth2provider
+38 http 403 https://registry.npmjs.org/warp.oauth2provider
+39 verbose headers { date: 'Wed, 17 Dec 2014 12:47:14 GMT',
+39 verbose headers   server: 'CouchDB/1.5.0 (Erlang OTP/R16B03)',
+39 verbose headers   'content-type': 'application/json',
+39 verbose headers   'cache-control': 'max-age=60',
+39 verbose headers   'content-length': '7681',
+39 verbose headers   'accept-ranges': 'bytes',
+39 verbose headers   via: '1.1 varnish',
+39 verbose headers   'x-served-by': 'cache-ams4132-AMS',
+39 verbose headers   'x-cache': 'MISS',
+39 verbose headers   'x-cache-hits': '0',
+39 verbose headers   'x-timer': 'S1418820434.266829,VS0,VE315',
+39 verbose headers   'keep-alive': 'timeout=10, max=50',
+39 verbose headers   connection: 'Keep-Alive' }
+40 error publish Failed PUT 403
+41 error Error: forbidden cannot modify pre-existing version: 0.0.4
+41 error old={"name":"warp.oauth2provider","description":"Easy to implement OAuth 2.0 / Redis provider implementation","author":{"name":"Chris Beemster"},"version":"0.0.4","repository":{"type":"git","url":"https://github.com/wearereasonablepeople/warp.oauth2provider.git"},"dependencies":{"async":"0.9.0"},"gitHead":"5c793422780c6a4ae946db31b04ed6c2170eae95","bugs":{"url":"https://github.com/wearereasonablepeople/warp.oauth2provider/issues"},"homepage":"https://github.com/wearereasonablepeople/warp.oauth2provider","_id":"warp.oauth2provider@0.0.4","scripts":{},"_shasum":"97959a93e08e43dd5abd30b9a3d52dd68657673a","_from":".","_npmVersion":"1.4.28","_npmUser":{"name":"wearereasonablepeople","email":"chris@wearereasonablepeople.com"},"maintainers":[{"name":"wearereasonablepeople","email":"chris@wearereasonablepeople.com"}],"dist":{"shasum":"97959a93e08e43dd5abd30b9a3d52dd68657673a","tarball":"http://registry.npmjs.org/warp.oauth2provider/-/warp.oauth2provider-0.0.4.tgz"}}
+41 error new={"name":"warp.oauth2provider","description":"Easy to implement OAuth 2.0 / Redis provider implementation","author":{"name":"Chris Beemster"},"version":"0.0.4","repository":{"type":"git","url":"https://github.com/wearereasonablepeople/warp.oauth2provider.git"},"dependencies":{"async":"0.9.0"},"readmeFilename":"README.md","gitHead":"5c793422780c6a4ae946db31b04ed6c2170eae95","bugs":{"url":"https://github.com/wearereasonablepeople/warp.oauth2provider/issues"},"homepage":"https://github.com/wearereasonablepeople/warp.oauth2provider","_id":"warp.oauth2provider@0.0.4","scripts":{},"_shasum":"9b9709159513c99228238d0aa2e5d88e177c50dd","_from":".","readme":"# warp-oauth2provider\u000a\u000a## Overview\u000awarp-oauth2provider is a simple but secure OAuth2 provider for ExpressJS 4 and Redis. A user can be logged in once per client.\u000a\u000aContains an example implementation, where the model is currently a static file, can be easily replaced with a SequelizeJS model (or similar, as long as it is implemented with a getByCredential method for the client and user object).\u000a\u000a## Changes\u000a0.0.3 Business logics and middleware separated.\u000a0.0.4 Updated documentation\u000a\u000a## Implementation\u000aThe example below is for illustrational purposes only. In real-life applications, store the sessions in Redis (or another session-store).\u000a\u000a\u0009var express = require('express'),\u000a\u0009    redis = require('redis'),\u000a\u0009    bodyParser = require('body-parser'),\u000a\u0009    session = require('express-session'),\u000a\u0009    btoa = require('btoa');\u000a\u0009var app = express();\u000a\u0009var oauth2lib = require('../index'),\u000a\u0009    oauth2 = new oauth2lib({\u000a\u0009        client: redis.createClient(),\u000a\u0009        model: {\u000a\u0009            client: require('./models/client.js'),\u000a\u0009            user: require('./models/user.js')\u000a\u0009        },\u000a\u0009        ttl: 600\u000a\u0009    });\u000a\u0009\u000a\u0009app.use(session({\u000a\u0009    secret: 'keyboard cat',\u000a\u0009    resave: false,\u000a\u0009    saveUninitialized: true\u000a\u0009}));\u000a\u0009app.use(bodyParser.urlencoded({ extended: false }));\u000a\u0009app.use(bodyParser.json());\u000a\u0009app.use(oauth2.inject());\u000a\u0009\u000a\u0009app.use('/', express.static('./frontend')); // static routes\u000a\u0009\u000a\u0009app.get('/secure', oauth2.middleware.isAuthorised, function(req, res) {\u000a\u0009    res.json({\u000a\u0009        userId: req.userId\u000a\u0009    });\u000a\u0009});\u000a\u0009\u000a\u0009app.get('/insecure', function(req, res) {\u000a\u0009    res.json(true);\u000a\u0009});\u000a\u0009\u000a\u0009app.post('/oauth/token', oauth2.middleware.createToken);\u000a\u0009\u000a\u0009app.post('/api/session', function(req, res){\u000a\u0009    req.oauth2.token.create(req.oauth2.options, req.body, {\u000a\u0009        authorization: 'Basic ' + btoa('3:secret')\u000a\u0009    }, function(err, data){\u000a\u0009        if (err){\u000a\u0009            res.status(err.status).send(err.body);\u000a\u0009        }\u000a\u0009        req.session.accessToken = data.accessToken;\u000a\u0009        return res.json(data);\u000a\u0009    });\u000a\u0009});\u000a\u0009\u000a\u0009var server = app.listen(3000, function () {\u000a\u0009    var host = server.address().address;\u000a\u0009    var port = server.address().port;\u000a\u0009\u000a\u0009    console.log('Example app listening at http://%s:%s', host, port);\u000a\u0009});\u000a\u000aAlso, see the /example folder in the module.\u000a\u000a## Usage\u000a### Create token\u000aFirst, make a POST to http://localhost:3000/oauth/token, with the following body:\u000a\u000a- grant_type: password\u000a- password: secret\u000a- scope: all\u000a- username: john@doe.com\u000a\u000a..and the following headers:\u000a\u000a- Content-Type: application/x-www-form-urlencoded; charset=utf-8\u000a- Accept-Language: nl;q=1, en;q=0.9, de;q=0.8\u000a- Authorization: Basic Mzptb29uc2hvdA==\u000a- User-Agent: YourAPP/47 (iPhone; iOS 8.1.1; Scale/2.00)\u000a\u000aThe Authorization header contains the string \"Basic\" and a base64-encoded string for \"clientId:clientSecret\". For instance \"3:secret\" will become \"MzpzZWNyZXQ=\".\u000a\u000aThis will return a JSON object like:\u000a\u000a\u0009{\u000a\u0009  \"refreshToken\" : \"a5b0f1433b5ce909698d56e8931008b7da5a58d4d279ee8da7008ee408bb11573d1cc361f7350478fa9a51862341a97ddac73f4f75a13e3e5a9d797224274876\",\u000a\u0009  \"accessToken\" : \"471c6cdcb726ee045e72f3b76478f692e8a667b05ced8a33f9ff894b1572d882\"\u000a\u0009}\u000a\u000aValidate your base64 strings on https://www.base64encode.org/\u000a\u000a### Sign in (for web-clients / server-side usage)\u000aIn order to allow a simple browser username / password sign-in mechanism, implement a method as follows:\u000a\u000a\u0009app.post('/api/session', function(req, res){\u000a\u0009    req.oauth2.token.create(req.oauth2.options, req.body, {\u000a\u0009        authorization: 'Basic ' + btoa('3:secret')\u000a\u0009    }, function(err, data){\u000a\u0009        if (err){\u000a\u0009            res.status(err.status).send(err.body);\u000a\u0009        }\u000a\u0009        req.session.accessToken = data.accessToken;\u000a\u0009        return res.json(data);\u000a\u0009    });\u000a\u0009});\u000a\u000aYou'll manually pass the options, body and headers to the OAuth createToken method. The callback method allows you to store the accessToken in a session or cookie and to return whatever you want to your client.\u000a\u000a## Limitations\u000aCurrently only supports username / password authentication.\u000a\u000a## To-do\u000a- Make session-logics optional (currently an access-token can be stored in a session as well).\u000a\u000a## Feedback\u000aContact us on info@wearereasonablepeople.com","_npmVersion":"1.4.28","_npmUser":{"name":"wearereasonablepeople","email":"chris@wearereasonablepeople.com"},"maintainers":[{"name":"wearereasonablepeople","email":"chris@wearereasonablepeople.com"}],"dist":{"shasum":"9b9709159513c99228238d0aa2e5d88e177c50dd","tarball":"http://registry.npmjs.org/warp.oauth2provider/-/warp.oauth2provider-0.0.4.tgz"}}: warp.oauth2provider
+41 error     at RegClient.<anonymous> (/usr/local/lib/node_modules/npm/node_modules/npm-registry-client/lib/request.js:308:14)
+41 error     at Request._callback (/usr/local/lib/node_modules/npm/node_modules/npm-registry-client/lib/request.js:246:65)
+41 error     at Request.self.callback (/usr/local/lib/node_modules/npm/node_modules/request/request.js:236:22)
+41 error     at Request.emit (events.js:98:17)
+41 error     at Request.<anonymous> (/usr/local/lib/node_modules/npm/node_modules/request/request.js:1142:14)
+41 error     at Request.emit (events.js:117:20)
+41 error     at IncomingMessage.<anonymous> (/usr/local/lib/node_modules/npm/node_modules/request/request.js:1096:12)
+41 error     at IncomingMessage.emit (events.js:117:20)
+41 error     at _stream_readable.js:943:16
+41 error     at process._tickCallback (node.js:419:13)
+42 error If you need help, you may report this *entire* log,
+42 error including the npm and node versions, at:
+42 error     <http://github.com/npm/npm/issues>
+43 error System Darwin 14.0.0
+44 error command "node" "/usr/local/bin/npm" "publish"
+45 error cwd /private/var/www/warpauth/node_modules/warp.oauth2provider
+46 error node -v v0.10.33
+47 error npm -v 1.4.28
+48 verbose exit [ 1, true ]

@@ -5,13 +5,21 @@ warp-oauth2provider is a simple but secure OAuth2 provider for ExpressJS 4 and R
 
 Contains an example implementation, where the model is currently a static file, can be easily replaced with a SequelizeJS model (or similar, as long as it is implemented with a getByCredential method for the client and user object).
 
-Implement as below;
+## Changes
+0.0.3 Business logics and middleware separated.
+0.0.4 Updated documentation
+0.0.5 Updated documentation
+
+## Implementation
+The example below is for illustrational purposes only. In real-life applications, store the sessions in Redis (or another session-store).
 
 	var express = require('express'),
 	    redis = require('redis'),
-	    bodyParser = require('body-parser');
+	    bodyParser = require('body-parser'),
+	    session = require('express-session'),
+	    btoa = require('btoa');
 	var app = express();
-	var oauth2lib = require('./warp-oauth2provider'),
+	var oauth2lib = require('../index'),
 	    oauth2 = new oauth2lib({
 	        client: redis.createClient(),
 	        model: {
@@ -20,31 +28,53 @@ Implement as below;
 	        },
 	        ttl: 600
 	    });
-
+	
+	app.use(session({
+	    secret: 'keyboard cat',
+	    resave: false,
+	    saveUninitialized: true
+	}));
 	app.use(bodyParser.urlencoded({ extended: false }));
 	app.use(bodyParser.json());
 	app.use(oauth2.inject());
-
+	
+	app.use('/', express.static('./frontend')); // static routes
+	
 	app.get('/secure', oauth2.middleware.isAuthorised, function(req, res) {
 	    res.json({
 	        userId: req.userId
 	    });
 	});
-
+	
 	app.get('/insecure', function(req, res) {
 	    res.json(true);
 	});
-
-	app.post('/oauth/token', oauth2.token.create);
-
+	
+	app.post('/oauth/token', oauth2.middleware.createToken);
+	
+	app.post('/api/session', function(req, res){
+	    req.oauth2.token.create(req.oauth2.options, req.body, {
+	        authorization: 'Basic ' + btoa('3:secret')
+	    }, function(err, data){
+	        if (err){
+	            res.status(err.status).send(err.body);
+	        }
+	        req.session.accessToken = data.accessToken;
+	        return res.json(data);
+	    });
+	});
+	
 	var server = app.listen(3000, function () {
 	    var host = server.address().address;
 	    var port = server.address().port;
-
+	
 	    console.log('Example app listening at http://%s:%s', host, port);
 	});
 
+Also, see the /example folder in the module.
+
 ## Usage
+### Create token
 First, make a POST to http://localhost:3000/oauth/token, with the following body:
 
 - grant_type: password
@@ -69,9 +99,29 @@ This will return a JSON object like:
 	}
 
 Validate your base64 strings on https://www.base64encode.org/
-.
+
+### Sign in (for web-clients / server-side usage)
+In order to allow a simple browser username / password sign-in mechanism, implement a method as follows:
+
+	app.post('/api/session', function(req, res){
+	    req.oauth2.token.create(req.oauth2.options, req.body, {
+	        authorization: 'Basic ' + btoa('3:secret')
+	    }, function(err, data){
+	        if (err){
+	            res.status(err.status).send(err.body);
+	        }
+	        req.session.accessToken = data.accessToken;
+	        return res.json(data);
+	    });
+	});
+
+You'll manually pass the options, body and headers to the OAuth createToken method. The callback method allows you to store the accessToken in a session or cookie and to return whatever you want to your client.
+
 ## Limitations
 Currently only supports username / password authentication.
+
+## To-do
+- Make session-logics optional (currently an access-token can be stored in a session as well).
 
 ## Feedback
 Contact us on info@wearereasonablepeople.com

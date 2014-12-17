@@ -1,15 +1,25 @@
 {
   "name": "warp.oauth2provider",
-  "description": "Simple but safe OAuth 2.0 provider implementation",
+  "description": "Easy to implement OAuth 2.0 / Redis provider implementation",
   "author": {
     "name": "Chris Beemster"
   },
-  "version": "0.0.1",
+  "version": "0.0.5",
   "repository": {
     "type": "git",
     "url": "https://github.com/wearereasonablepeople/warp.oauth2provider.git"
   },
   "dependencies": {
     "async": "0.9.0"
-  }
+  },
+  "readmeFilename": "README.md",
+  "gitHead": "5c793422780c6a4ae946db31b04ed6c2170eae95",
+  "bugs": {
+    "url": "https://github.com/wearereasonablepeople/warp.oauth2provider/issues"
+  },
+  "homepage": "https://github.com/wearereasonablepeople/warp.oauth2provider",
+  "_id": "warp.oauth2provider@0.0.1",
+  "scripts": {},
+  "_shasum": "2b41fbcec1110ee557c377385713583551bb1989",
+  "_from": "warp.oauth2provider@latest"
 }

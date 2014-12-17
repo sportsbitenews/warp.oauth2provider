@@ -2,8 +2,7 @@ var async = require('async'),
     crypto = require('crypto');
 
 module.exports = {
-    create: function (req, res) {
-        var options = req.oauth2.options;
+    create: function (options, body, headers, next) {
         var model = options.model;
         var clientId = null;
         var clientSecret = null;
@@ -15,19 +14,19 @@ module.exports = {
         async.series([
             function (callback) {
                 // basic validation
-                if (!req.headers || !req.headers.authorization) {
-                    return res.status(403).send('No authorization header passed');
+                if (!headers || !headers.authorization) {
+                    return next({status: 403, body: 'No authorization header passed'});
                 }
-                var pieces = req.headers.authorization.split(' ', 2);
+                var pieces = headers.authorization.split(' ', 2);
                 if (!pieces || pieces.length !== 2) {
-                    return res.status(403).send('Authorization header is corrupted');
+                    return next({status: 403, body: 'Authorization header is corrupted'});
                 }
                 if (pieces[0] !== 'Basic') {
-                    return res.status(403).send('Unsupported authorization method: ', pieces[0]);
+                    return next({status: 403, body: 'Unsupported authorization method: ' + pieces[0]});
                 }
                 pieces = new Buffer(pieces[1], 'base64').toString('ascii').split(':', 2);
                 if (!pieces || pieces.length !== 2) {
-                    return res.status(403).send('Authorization header has corrupted data');
+                    return next({status: 403, body: 'Authorization header has corrupted data'});
                 }
                 clientId = pieces[0];
                 clientSecret = pieces[1];
@@ -37,7 +36,7 @@ module.exports = {
                 // client
                 model.client.getByCredentials(clientId, clientSecret, function (result) {
                     if (!result) {
-                        return res.status(403).send('Invalid client credentials');
+                        return next({status: 403, body: 'Invalid client credentials'});
                     }
                     client = result;
                     callback();
@@ -45,9 +44,9 @@ module.exports = {
             },
             function (callback) {
                 // user
-                model.user.getByCredentials(req.body.username, req.body.password, function (result) {
+                model.user.getByCredentials(body.username, body.password, function (result) {
                     if (!result) {
-                        return res.status(403).send('Invalid user credentials');
+                        return next({status: 403, body: 'Invalid user credentials'});
                     }
                     user = result;
                     callback();
@@ -74,8 +73,7 @@ module.exports = {
                 }), callback);
             },
             function () {
-                // return json object
-                return res.json(value);
+                return next(null, value);
             }
         ]);
     }
