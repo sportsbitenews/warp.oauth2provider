@@ -4,7 +4,7 @@ module.exports = {
     createToken: function(req, res, next){
         req.oauth2.token.create(req.oauth2.options, req.body, req.headers, function(err, data){
             if (err){
-                return res.status(err.status).send(err.body);
+                res.status(err.status).send(err.body);
             }
             return res.json(data);
         });
@@ -16,7 +16,7 @@ module.exports = {
         var key = null;
         var userId = null;
 
-        if (!accessToken){ accessToken = req.session.accessToken; } // get from session - should be an option
+        if (!accessToken){ accessToken = req.session.accessToken; } // get from session - allow should be an option
 
         async.series([
             function (callback) {
@@ -37,7 +37,10 @@ module.exports = {
                         return res.status(403).send('another client is signed in');
                     }
                     req.userId = userId;
-                    req.oauth2.accessToken = {userId: userId};
+                    req.oauth2.accessToken = {
+                        userId: userId,
+                        token: accessToken
+                    }; // mainly here for legacy reasons
                     return next();
                 });
             }
