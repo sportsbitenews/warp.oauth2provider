@@ -4,7 +4,7 @@
   "author": {
     "name": "Chris Beemster"
   },
-  "version": "0.0.5",
+  "version": "0.0.6",
   "repository": {
     "type": "git",
     "url": "https://github.com/wearereasonablepeople/warp.oauth2provider.git"
@@ -12,14 +12,30 @@
   "dependencies": {
     "async": "0.9.0"
   },
-  "readmeFilename": "README.md",
   "gitHead": "5c793422780c6a4ae946db31b04ed6c2170eae95",
   "bugs": {
     "url": "https://github.com/wearereasonablepeople/warp.oauth2provider/issues"
   },
   "homepage": "https://github.com/wearereasonablepeople/warp.oauth2provider",
-  "_id": "warp.oauth2provider@0.0.1",
+  "_id": "warp.oauth2provider@0.0.5",
   "scripts": {},
-  "_shasum": "2b41fbcec1110ee557c377385713583551bb1989",
-  "_from": "warp.oauth2provider@latest"
+  "_shasum": "6802fe076845cb0af7e5bcfdb8ae2e8acfed3699",
+  "_from": "warp.oauth2provider@0.0.5",
+  "_npmVersion": "1.4.28",
+  "_npmUser": {
+    "name": "wearereasonablepeople",
+    "email": "chris@wearereasonablepeople.com"
+  },
+  "maintainers": [
+    {
+      "name": "wearereasonablepeople",
+      "email": "chris@wearereasonablepeople.com"
+    }
+  ],
+  "dist": {
+    "shasum": "6802fe076845cb0af7e5bcfdb8ae2e8acfed3699",
+    "tarball": "http://registry.npmjs.org/warp.oauth2provider/-/warp.oauth2provider-0.0.5.tgz"
+  },
+  "directories": {},
+  "_resolved": "https://registry.npmjs.org/warp.oauth2provider/-/warp.oauth2provider-0.0.5.tgz"
 }

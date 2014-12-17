@@ -1,3 +1,4 @@
+// example! needs modification before it can be used in a real-life scenario!
 var express = require('express'),
     redis = require('redis'),
     bodyParser = require('body-parser'),
