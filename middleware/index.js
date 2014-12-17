@@ -20,7 +20,6 @@ module.exports = {
 
         async.series([
             function (callback) {
-                console.log(accessToken);
                 client.get('accesstoken:' + accessToken, function (err, data) {
                     if (!data) {
                         return res.status(403).send('invalid accessToken');
