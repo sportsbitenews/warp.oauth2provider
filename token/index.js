@@ -76,5 +76,49 @@ module.exports = {
                 return next(null, value);
             }
         ]);
+    },
+    isAuthorised: function (req, next) {
+        var options = req.oauth2.options;
+        var client = options.client;
+        var accessToken = req.query.access_token;
+        var key = null;
+        var userId = null;
+
+        if (!accessToken) {
+            accessToken = req.session.accessToken;
+        } // get from session - allow should be an option
+
+        if (req.headers.authorization && req.headers.authorization.toLowerCase().split('bearer ').length === 2) {
+            accessToken = req.headers.authorization.toLowerCase().split('bearer ')[1];
+        } // support for accessToken provided by header
+
+        async.series([
+            function (callback) {
+                client.get('accesstoken:' + accessToken, function (err, data) {
+                    if (!data) {
+                        return next({isAuthorised: false, message: 'invalid accessToken'});
+                    }
+                    var json = JSON.parse(data);
+                    key = json.key;
+                    userId = json.userId;
+                    callback();
+                });
+            },
+            function () {
+                client.get(key, function (err, data) {
+                    var redisAccessToken = JSON.parse(data).accessToken;
+                    if (redisAccessToken !== accessToken) {
+                        return next({isAuthorised: false, message: 'another session active'});
+                    }
+                    return next({
+                        isAuthorised: true,
+                        accessToken: {
+                            userId: userId,
+                            token: accessToken
+                        }
+                    });
+                });
+            }
+        ]);
     }
 };

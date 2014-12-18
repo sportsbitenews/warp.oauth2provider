@@ -9,6 +9,8 @@ Contains an example implementation, where the model is currently a static file, 
 0.0.3 Business logics and middleware separated.
 0.0.4 Updated documentation
 0.0.5 Updated documentation
+...
+0.0.11 Refactored, better separation between token logics and middleware.
 
 ## Implementation
 The example below is for illustrational purposes only. In real-life applications, store the sessions in Redis (or another session-store).
@@ -100,6 +102,8 @@ This will return a JSON object like:
 
 Validate your base64 strings on https://www.base64encode.org/
 
+Now you can access protected endpoints with ?access_token=... or with the token in the Authorization HTTP header.
+
 ### Sign in (for web-clients / server-side usage)
 In order to allow a simple browser username / password sign-in mechanism, implement a method as follows:
 
@@ -119,9 +123,6 @@ You'll manually pass the options, body and headers to the OAuth createToken meth
 
 ## Limitations
 Currently only supports username / password authentication.
-
-## To-do
-- Make session-logics optional (currently an access-token can be stored in a session as well).
 
 ## Feedback
 Contact us on info@wearereasonablepeople.com
