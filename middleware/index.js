@@ -14,8 +14,8 @@ module.exports = {
         });
     },
     isAuthorised: function (req, res, next) {
-        req.oauth2.token.isAuthorised(req, function(data){
-            if (!data.isAuthorised){
+        req.oauth2.token.isAuthorised(req, function (data) {
+            if (!data.isAuthorised) {
                 return res.status(403).send(data.message);
             }
 

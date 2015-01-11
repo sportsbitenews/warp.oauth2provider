@@ -77,6 +77,26 @@ module.exports = {
             }
         ]);
     },
+    delete: function (req, next) {
+        var options = req.oauth2.options;
+        var client = options.client;
+        var accessToken = req.query.access_token;
+        var key = null;
+        var userId = null;
+
+        if (!accessToken) {
+            accessToken = req.session.accessToken;
+        } // get from session - allow should be an option
+
+        if (req.headers.authorization && req.headers.authorization.toLowerCase().split('bearer ').length === 2) {
+            accessToken = req.headers.authorization.toLowerCase().split('bearer ')[1];
+        } // support for accessToken provided by header
+
+        // delete key from redis
+        options.client.del('accesstoken:' + accessToken, function(err){
+            return next();
+        });
+    },
     isAuthorised: function (req, next) {
         var options = req.oauth2.options;
         var client = options.client;
