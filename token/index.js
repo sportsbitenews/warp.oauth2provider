@@ -73,6 +73,7 @@ module.exports = {
                 }), callback);
             },
             function () {
+                value.userId = user.id;
                 return next(null, value);
             }
         ]);
