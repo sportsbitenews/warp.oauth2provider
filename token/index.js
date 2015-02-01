@@ -49,6 +49,9 @@ module.exports = {
                         return next({status: 403, body: 'Invalid user credentials'});
                     }
                     user = result;
+                    if (!user.isConfirmed){
+                        return next({status: 403, body: 'User account is not confirmed'});
+                    }
                     callback();
                 });
             },
