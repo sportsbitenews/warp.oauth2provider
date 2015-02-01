@@ -11,6 +11,7 @@ Contains an example implementation, where the model is currently a static file, 
 0.0.5 Updated documentation
 ...
 0.0.11 Refactored, better separation between token logics and middleware.
+0.0.14 Implemented check for user.isConfirmed property, make sure you'll have one in your model!
 
 ## Implementation
 The example below is for illustrational purposes only. In real-life applications, store the sessions in Redis (or another session-store).
