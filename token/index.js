@@ -66,11 +66,9 @@ module.exports = {
                     jsonAccessToken = jwt.sign({
                         userId: user.id,
                         email: user.email,
-                        role: user.role,
-                        ttl: options.ttl
+                        role: user.role
                     }, jwt_secret, {expiresIn: options.ttl});
                 }
-
                 value = {
                     accessToken: jwt_secret ? jsonAccessToken : crypto.randomBytes(32).toString('hex'),
                     refreshToken: crypto.randomBytes(64).toString('hex')
@@ -271,22 +269,9 @@ module.exports = {
 
                     }
                     else {
-                        if (options['jwt_secret']) {
-                            try {
-                                var decoded = jwt.verify(data, options['jwt_secret']);
-                                userId = decoded.userId
-                                email = decoded.email;
-                                role = decoded.role;
-                            }catch(err){
-                                console.log("Error parsing token");
-                                return next({isAuthorised: false, message: 'Error parsing token json token'});
-                            }
-                        }
-                        else {
-                            var json = JSON.parse(data);
-                            key = json.key;
-                            userId = json.userId;
-                        }
+                        var json = JSON.parse(data);
+                        key = json.key;
+                        userId = json.userId;
                         return callback();
                     }
                 });
@@ -297,25 +282,13 @@ module.exports = {
                         return next({isAuthorised: false, message: 'another session active'});
                     }
                     //todo
-                    if (options['jwt_secret']) {
-                        return next({
-                            isAuthorised: true,
-                            accessToken: {
-                                userId: userId,
-                                token: accessToken,
-                                email: email,
-                                role: role
-                            }
-                        });
-                    } else {
-                        return next({
-                            isAuthorised: true,
-                            accessToken: {
-                                userId: userId,
-                                token: accessToken
-                            }
-                        });
-                    }
+                    return next({
+                        isAuthorised: true,
+                        accessToken: {
+                            userId: userId,
+                            token: accessToken
+                        }
+                    });
 
                 });
             }
