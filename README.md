@@ -2,6 +2,7 @@
 
 ## Overview
 warp-oauth2provider is a simple but secure OAuth2 provider for ExpressJS 4 and Redis. A user can be logged in once per client.
+If you use jwt-secret, the module will use json web token.
 
 Contains an example implementation, where the model is currently a static file, can be easily replaced with a SequelizeJS model (or similar, as long as it is implemented with a getByCredential method for the client and user object).
 
@@ -25,6 +26,7 @@ The example below is for illustrational purposes only. In real-life applications
 	var oauth2lib = require('../index'),
 	    oauth2 = new oauth2lib({
 	        client: redis.createClient(),
+	        "jwt-secret": 'TOP SECRET',
 	        model: {
 	            client: require('./models/client.js'),
 	            user: require('./models/user.js')
@@ -94,14 +96,21 @@ First, make a POST to http://localhost:3000/oauth/token, with the following body
 
 The Authorization header contains the string "Basic" and a base64-encoded string for "clientId:clientSecret". For instance "3:secret" will become "MzpzZWNyZXQ=".
 
-This will return a JSON object like:
+If you do not use json web token, this will return a JSON object like:
 
 	{
 	  "refreshToken" : "a5b0f1433b5ce909698d56e8931008b7da5a58d4d279ee8da7008ee408bb11573d1cc361f7350478fa9a51862341a97ddac73f4f75a13e3e5a9d797224274876",
 	  "accessToken" : "471c6cdcb726ee045e72f3b76478f692e8a667b05ced8a33f9ff894b1572d882"
 	}
-
 Validate your base64 strings on https://www.base64encode.org/
+
+In case of json web token: 
+
+    {
+        "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiZW1haWwiLCJyb2xlIjoicm9sZSIsInR0bCI6NjAwLCJpYXQiOjE0NjQ2MDE1NDUsImV4cCI6MTQ2NDYwMjE0NX0.Cfr4C9EK-0jKazDGsQNaFBgFdl0sNwq0rS4zbxQMfuQ",
+        "refreshToken": "2722317b6178904927f5cbda6ca6c9df63ae9fff4160023405ce63e38543629f113f3cffda94b40717b615e428336a2da41396c357c28a8b4f43837ed89b772e",
+    }
+
 
 Now you can access protected endpoints with ?access_token=... or with the token in the Authorization HTTP header.
 

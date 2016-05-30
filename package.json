@@ -10,7 +10,8 @@
     "url": "https://github.com/wearereasonablepeople/warp.oauth2provider.git"
   },
   "dependencies": {
-    "async": "0.9.0"
+    "async": "0.9.0",
+    "jsonwebtoken": "^7.0.0"
   },
   "gitHead": "5c793422780c6a4ae946db31b04ed6c2170eae95",
   "bugs": {
