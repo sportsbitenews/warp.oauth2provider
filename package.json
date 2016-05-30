@@ -4,7 +4,7 @@
   "author": {
     "name": "Chris Beemster"
   },
-  "version": "0.0.13",
+  "version": "0.0.22",
   "repository": {
     "type": "git",
     "url": "https://github.com/wearereasonablepeople/warp.oauth2provider.git"
@@ -18,10 +18,10 @@
     "url": "https://github.com/wearereasonablepeople/warp.oauth2provider/issues"
   },
   "homepage": "https://github.com/wearereasonablepeople/warp.oauth2provider",
-  "_id": "warp.oauth2provider@0.0.12",
+  "_id": "warp.oauth2provider@0.0.22",
   "scripts": {},
   "_shasum": "de191d510198191a97ef1f548bedf8648cb78d13",
-  "_from": "warp.oauth2provider@0.0.12",
+  "_from": "warp.oauth2provider@0.0.22",
   "_npmVersion": "1.4.28",
   "_npmUser": {
     "name": "wearereasonablepeople",
