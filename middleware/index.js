@@ -2,7 +2,6 @@ var async = require('async');
 
 module.exports = {
     createToken: function (req, res, next) {
-        console.log("create");
         req.oauth2.token.create(req.oauth2.options, req.body, req.headers, function (err, data) {
             if (err) {
                 return res.status(err.status).send(err.body);

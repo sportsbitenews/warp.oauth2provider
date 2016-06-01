@@ -250,8 +250,8 @@ module.exports = {
             accessToken = req.cookies.token;
         } // get from cookie - allow should be an option
 
-        if (req.headers.authorization && req.headers.authorization.toLowerCase().split('bearer ').length === 2) {
-            accessToken = req.headers.authorization.toLowerCase().split('bearer ')[1];
+        if (req.headers.authorization && req.headers.authorization.split('Bearer ').length === 2) {
+            accessToken = req.headers.authorization.split('Bearer ')[1];
         } // support for accessToken provided by header
 
         async.series([
